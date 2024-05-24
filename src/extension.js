@@ -5,11 +5,10 @@ const globalState = require("./globalState");
 const configuration = require("./configuration");
 
 let item;
-let profileName = "";
+let profileName;
 
 async function activate(context) {
   let workspaceFolders = vscode.workspace.workspaceFolders;
-
   // a workspace is open
   if (workspaceFolders) {
     let mainWorkspaceUri = workspaceFolders[0].uri;
@@ -20,11 +19,13 @@ async function activate(context) {
 
       let state = globalState(globalStateUri);
       profileName = await state.getProfileName(mainWorkspaceUri);
+      context.globalState.update('lastProfile',profileName);
     } catch (err) {
       console.error(err);
     }
   } else {
-    profileName = "Default";
+    profileName = context.globalState.get('lastProfile') ?? 'Default';
+    console.log(profileName);
   }
 
   showStatusBarItem();
